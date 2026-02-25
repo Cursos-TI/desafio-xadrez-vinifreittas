@@ -1,7 +1,7 @@
 // ==================================================================
 // Desafio de Xadrez - MateCheck
-// Versão 1.5 - Nível iniciante + Extras
-// Objetivo: utilizar estruturas de repetição variadas (for, while ou do-while) para simular o movimento das peças do jogo de xadrez.
+// Versão 2.0 - Nível aventureiro
+// Objetivo: utilizar estruturas de repetição aninhadas para simular o movimento do cavalo (um L).
 // ==================================================================
 
 #include <stdio.h>
@@ -10,6 +10,7 @@
 #include <locale.h>
 
 // Estilos de texto (ANSI)
+#define NEGRITO "\033[1m"
 #define BG_BRANCO "\033[47m"
 #define BG_PRETO "\033[40m"
 #define RESET "\033[0m"
@@ -51,18 +52,17 @@ void limpar_tela() {
     system("cls || clear");
 }
 
-const char *casa_para_simbolo(Casa *casa) {
-    const char *pecas_brancas[] = { "♙", "♖", "♗", "♘", "♕", "♔" };
-    const char *pecas_pretas[] = { "♟", "♜", "♝", "♞", "♛", "♚" };
+void imprimir_titulo (char *titulo) {
+    limpar_tela();
+    printf("\n\n\n\n\n\n %20s%s%20s", NEGRITO, titulo, RESET);
+    sleep(2);
+}
 
-    const char *simbolo;
-    if (casa->status == PECA_NULL) {
-        simbolo = " ";
-    } else {
-        simbolo = (casa->cor == COR_BRANCO) ? pecas_brancas[casa->status - 1] : pecas_pretas[casa->status - 1];
-    }
+const char *casa_para_simbolo(Casa *casa) {
+    const char *pecas_brancas[] = { " ", "♙", "♖", "♗", "♘", "♕", "♔" };
+    const char *pecas_pretas[] = { " ", "♟", "♜", "♝", "♞", "♛", "♚" };
     
-    return simbolo;
+    return (casa->cor == COR_BRANCO) ? pecas_brancas[casa->status] : pecas_pretas[casa->status];
 }
 
 
@@ -123,8 +123,11 @@ int main() {
 
     
     // Torre
+    imprimir_titulo("Torre");
+
     inicializar_tabuleiro(&matriz);
     matriz.casas[0][0] = (Casa) { PECA_TORRE, COR_PRETO };
+    imprimir_tabuleiro(&matriz);
 
     for (int i = 0; i < 5; i++) {
         Casa *origem = &matriz.casas[0][i];
@@ -136,8 +139,11 @@ int main() {
 
 
     // Bispo
+    imprimir_titulo("Bispo");
+
     inicializar_tabuleiro(&matriz);
     matriz.casas[7][0] = (Casa) { PECA_BISPO, COR_PRETO };
+    imprimir_tabuleiro(&matriz);
 
     int linha = 7;
     int coluna = 0;
@@ -152,8 +158,11 @@ int main() {
 
 
     // Rainha
+    imprimir_titulo("Rainha");
+
     inicializar_tabuleiro(&matriz);
     matriz.casas[0][7] = (Casa) { PECA_DAMA, COR_PRETO };
+    imprimir_tabuleiro(&matriz);
 
     int i = 7;
     do {
@@ -162,8 +171,34 @@ int main() {
 
         mover_peca(origem, destino);
         imprimir_tabuleiro(&matriz);
-    } while (i >= 0);
+    } while (i > 0);
 
+
+    // Cavalo
+    imprimir_titulo("Cavalo");
+
+    inicializar_tabuleiro(&matriz);
+    matriz.casas[4][4] = (Casa) { PECA_CAVALO, COR_PRETO };
+    imprimir_tabuleiro(&matriz);
+
+    linha = 4;
+    coluna = 4;
+
+    for (int i = 0; i < 3; i++) {
+        while (i < 2) {
+            Casa *origem = &matriz.casas[linha][coluna];
+            Casa *destino = &matriz.casas[++linha][coluna]; // sobe
+
+            mover_peca(origem, destino);
+            imprimir_tabuleiro(&matriz);
+            i++;
+        }
+        Casa *origem = &matriz.casas[linha][coluna];
+        Casa *destino = &matriz.casas[linha][--coluna]; // vai para esquerda
+
+        mover_peca(origem, destino);
+        imprimir_tabuleiro(&matriz);
+    }
 
     return 0;
 }
