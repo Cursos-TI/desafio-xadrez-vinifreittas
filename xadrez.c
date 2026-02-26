@@ -1,7 +1,7 @@
 // ==================================================================
 // Desafio de Xadrez - MateCheck
-// Versão 2.5 - Melhorias na estrutura e legibilidade do código.
-// Objetivo: deixar o código mais organizado, legível e fácil de entender, mantendo a funcionalidade original.
+// Versão 3.0 - Nivel mestre
+// Objetivo: usar funçoes recursivas para simular movimentos das peças e loop avançado para o cavalo.
 // ==================================================================
 
 #include <stdio.h>
@@ -135,6 +135,34 @@ void imprimir_tabuleiro(Tabuleiro *matriz) {
 
 /* ========================== Função Principal ========================== */
 
+void mov_torre(int i, Tabuleiro *matriz, Casa **peca) {
+    if (i == 0) return; // Condição de parada da recursão.
+    
+    mover_peca(matriz, peca, MOV_DIREITA);
+    imprimir_tabuleiro(matriz);
+    
+    mov_torre(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+}
+
+void mov_bispo(int i, Tabuleiro *matriz, Casa **peca) {
+    if (i == 0) return; // Condição de parada da recursão.
+    
+    mover_peca(matriz, peca, MOV_CIMA);
+    mover_peca(matriz, peca, MOV_DIREITA);
+    imprimir_tabuleiro(matriz);
+    
+    mov_bispo(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+}
+
+void mov_rainha(int i, Tabuleiro *matriz, Casa **peca) {
+    if (i == 0) return; // Condição de parada da recursão.
+    
+    mover_peca(matriz, peca, MOV_ESQUERDA);
+    imprimir_tabuleiro(matriz);
+    
+    mov_rainha(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+}
+
 
 int main() {
     setlocale(LC_ALL, "pt_BR.UTF-8");
@@ -150,10 +178,8 @@ int main() {
     *peca = (Casa) { PECA_TORRE, COR_PRETO }; 
 
     imprimir_tabuleiro(&matriz);
-    for (int i = 0; i < 5; i++) {
-        mover_peca(&matriz, &peca, MOV_DIREITA);
-        imprimir_tabuleiro(&matriz);
-    }
+
+    mov_torre(5, &matriz, &peca); // Chama a função recursiva para mover a torre 5 vezes para a direita.
 
 
     // Bispo
@@ -166,12 +192,8 @@ int main() {
     imprimir_tabuleiro(&matriz);
 
     int i = 0;
-    while (i < 5) {
-        mover_peca(&matriz, &peca, MOV_CIMA);
-        mover_peca(&matriz, &peca, MOV_DIREITA);
-        imprimir_tabuleiro(&matriz);
-        i++;
-    }
+    
+    mov_bispo(5, &matriz, &peca); // Chama a função recursiva para mover o bispo 5 vezes para cima-direita.
 
 
     // Rainha
@@ -183,12 +205,7 @@ int main() {
 
     imprimir_tabuleiro(&matriz);
 
-    i = 7;
-    do {
-        mover_peca(&matriz, &peca, MOV_ESQUERDA);
-        imprimir_tabuleiro(&matriz);
-        i--;
-    } while (i > 0);
+    mov_rainha(7, &matriz, &peca); // Chama a função recursiva para mover a rainha 7 vezes para a esquerda.
 
 
     // Cavalo
@@ -199,15 +216,16 @@ int main() {
     *peca = (Casa) { PECA_CAVALO, COR_PRETO };
 
     imprimir_tabuleiro(&matriz);
-    for (int i = 0; i < 3; i++) {
-        while (i < 2) {
+    for (int i = 0, j = 0; i < 3; i++) {
+        if (j < 2) {
             mover_peca(&matriz, &peca, MOV_CIMA);
             imprimir_tabuleiro(&matriz);
-            i++;
+            j++;
+        } else {
+            mover_peca(&matriz, &peca, MOV_ESQUERDA);
+            imprimir_tabuleiro(&matriz);
         }
-        mover_peca(&matriz, &peca, MOV_ESQUERDA);
-        imprimir_tabuleiro(&matriz);
     }
-
+    
     return 0;
 }
