@@ -1,7 +1,7 @@
 // ==================================================================
 // Desafio de Xadrez - MateCheck
-// Versão 2.0 - Nível aventureiro
-// Objetivo: utilizar estruturas de repetição aninhadas para simular o movimento do cavalo (um L).
+// Versão 2.5 - Melhorias na estrutura e legibilidade do código.
+// Objetivo: deixar o código mais organizado, legível e fácil de entender, mantendo a funcionalidade original.
 // ==================================================================
 
 #include <stdio.h>
@@ -44,6 +44,14 @@ typedef struct {
     Casa casas[8][8];
 } Tabuleiro;
 
+// Codificação dos tipos de movimento.
+typedef enum {
+    MOV_CIMA,
+    MOV_BAIXO,
+    MOV_ESQUERDA,
+    MOV_DIREITA
+} TipoMovimento;
+
 
 
 /* ========================== Utilitários ========================== */
@@ -70,16 +78,28 @@ const char *casa_para_simbolo(Casa *casa) {
 
 
 void inicializar_tabuleiro(Tabuleiro *matriz) {
-    for (int linha = 0; linha < 8; linha++) {
-        for (int coluna = 0; coluna < 8; coluna++) {
-            matriz->casas[linha][coluna] = (Casa) {PECA_NULL, COR_NULL};
-        }
-    }
+    memset(matriz, 0, sizeof(Tabuleiro)); // Zera toda a estrutura do tabuleiro.
 }
 
-void mover_peca(Casa *origem, Casa *destino) {
-    *destino = *origem; // Copia origem para destino.
-    *origem = (Casa) {PECA_NULL, COR_NULL}; // Zera a origem.
+void mover_peca(Tabuleiro *matriz, Casa **peca, TipoMovimento movimento) {
+    
+    // Calcula a posição de peça
+    int pos_linear = *peca - &matriz->casas[0][0];
+    int linha = pos_linear / 8;
+    int coluna = pos_linear % 8;
+
+    // Calcula a posição de destino
+    switch (movimento) {
+        case MOV_CIMA: linha--; break;
+        case MOV_BAIXO: linha++; break;
+        case MOV_ESQUERDA: coluna--; break;
+        case MOV_DIREITA: coluna++; break;
+    }
+    Casa *destino = &matriz->casas[linha][coluna];
+    
+    *destino = **peca; // Copia o conteudo de peça para destino.
+    **peca = (Casa) {PECA_NULL, COR_NULL}; // Zera a origem.
+    *peca = destino; // Atualiza o ponteiro de peça para a nova localização.
 }
 
 void imprimir_tabuleiro(Tabuleiro *matriz) {
@@ -120,83 +140,72 @@ int main() {
     setlocale(LC_ALL, "pt_BR.UTF-8");
     
     Tabuleiro matriz;
-
+    Casa *peca; // Ponteiro para a peça.
     
     // Torre
     imprimir_titulo("Torre");
-
     inicializar_tabuleiro(&matriz);
-    matriz.casas[0][0] = (Casa) { PECA_TORRE, COR_PRETO };
+
+    peca = &matriz.casas[0][0];
+    *peca = (Casa) { PECA_TORRE, COR_PRETO }; 
+
     imprimir_tabuleiro(&matriz);
-
     for (int i = 0; i < 5; i++) {
-        Casa *origem = &matriz.casas[0][i];
-        Casa *destino = &matriz.casas[0][i + 1]; // vai para direita
-
-        mover_peca(origem, destino);
+        mover_peca(&matriz, &peca, MOV_DIREITA);
         imprimir_tabuleiro(&matriz);
     }
 
 
     // Bispo
     imprimir_titulo("Bispo");
-
     inicializar_tabuleiro(&matriz);
-    matriz.casas[7][0] = (Casa) { PECA_BISPO, COR_PRETO };
+
+    peca = &matriz.casas[7][0];
+    *peca = (Casa) { PECA_BISPO, COR_PRETO }; 
+
     imprimir_tabuleiro(&matriz);
 
-    int linha = 7;
-    int coluna = 0;
-
-    while (coluna < 5) {
-        Casa *origem = &matriz.casas[linha][coluna];
-        Casa *destino = &matriz.casas[--linha][++coluna]; // sobe e vai para direita
-
-        mover_peca(origem, destino);
+    int i = 0;
+    while (i < 5) {
+        mover_peca(&matriz, &peca, MOV_CIMA);
+        mover_peca(&matriz, &peca, MOV_DIREITA);
         imprimir_tabuleiro(&matriz);
+        i++;
     }
 
 
     // Rainha
     imprimir_titulo("Rainha");
-
     inicializar_tabuleiro(&matriz);
-    matriz.casas[0][7] = (Casa) { PECA_DAMA, COR_PRETO };
+
+    peca = &matriz.casas[0][7];
+    *peca = (Casa) { PECA_DAMA, COR_PRETO }; 
+
     imprimir_tabuleiro(&matriz);
 
-    int i = 7;
+    i = 7;
     do {
-        Casa *origem = &matriz.casas[0][i];
-        Casa *destino = &matriz.casas[0][--i]; // vai para esquerda
-
-        mover_peca(origem, destino);
+        mover_peca(&matriz, &peca, MOV_ESQUERDA);
         imprimir_tabuleiro(&matriz);
+        i--;
     } while (i > 0);
 
 
     // Cavalo
     imprimir_titulo("Cavalo");
-
     inicializar_tabuleiro(&matriz);
-    matriz.casas[4][4] = (Casa) { PECA_CAVALO, COR_PRETO };
+
+    peca = &matriz.casas[4][4];
+    *peca = (Casa) { PECA_CAVALO, COR_PRETO };
+
     imprimir_tabuleiro(&matriz);
-
-    linha = 4;
-    coluna = 4;
-
     for (int i = 0; i < 3; i++) {
         while (i < 2) {
-            Casa *origem = &matriz.casas[linha][coluna];
-            Casa *destino = &matriz.casas[++linha][coluna]; // sobe
-
-            mover_peca(origem, destino);
+            mover_peca(&matriz, &peca, MOV_CIMA);
             imprimir_tabuleiro(&matriz);
             i++;
         }
-        Casa *origem = &matriz.casas[linha][coluna];
-        Casa *destino = &matriz.casas[linha][--coluna]; // vai para esquerda
-
-        mover_peca(origem, destino);
+        mover_peca(&matriz, &peca, MOV_ESQUERDA);
         imprimir_tabuleiro(&matriz);
     }
 
