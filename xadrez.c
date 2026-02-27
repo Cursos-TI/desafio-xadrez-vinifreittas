@@ -15,7 +15,7 @@
 #define BG_PRETO "\033[40m"
 #define RESET "\033[0m"
 
-// Codificação do tipo de peça.
+// Codificação para o tipo de peça.
 typedef enum {
     PECA_NULL = 0,
     PECA_PEAO,
@@ -26,7 +26,7 @@ typedef enum {
     PECA_REI
 } TipoPeca;
 
-// Codificação da cor da peça.
+// Codificação para a cor da peça.
 typedef enum {
     COR_NULL = 0,
     COR_PRETO,
@@ -44,7 +44,7 @@ typedef struct {
     Casa casas[8][8];
 } Tabuleiro;
 
-// Codificação dos tipos de movimento.
+// Codificação para os tipos de movimento.
 typedef enum {
     MOV_CIMA,
     MOV_BAIXO,
@@ -136,31 +136,31 @@ void imprimir_tabuleiro(Tabuleiro *matriz) {
 /* ========================== Função Principal ========================== */
 
 void mov_torre(int i, Tabuleiro *matriz, Casa **peca) {
-    if (i == 0) return; // Condição de parada da recursão.
+    if (i == 0) return; 
     
     mover_peca(matriz, peca, MOV_DIREITA);
     imprimir_tabuleiro(matriz);
     
-    mov_torre(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+    mov_torre(i - 1, matriz, peca); 
 }
 
 void mov_bispo(int i, Tabuleiro *matriz, Casa **peca) {
-    if (i == 0) return; // Condição de parada da recursão.
+    if (i == 0) return;
     
     mover_peca(matriz, peca, MOV_CIMA);
     mover_peca(matriz, peca, MOV_DIREITA);
     imprimir_tabuleiro(matriz);
     
-    mov_bispo(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+    mov_bispo(i - 1, matriz, peca); 
 }
 
 void mov_rainha(int i, Tabuleiro *matriz, Casa **peca) {
-    if (i == 0) return; // Condição de parada da recursão.
+    if (i == 0) return;
     
     mover_peca(matriz, peca, MOV_ESQUERDA);
     imprimir_tabuleiro(matriz);
     
-    mov_rainha(i - 1, matriz, peca); // Chamada recursiva para o próximo movimento.
+    mov_rainha(i - 1, matriz, peca); 
 }
 
 
@@ -179,7 +179,7 @@ int main() {
 
     imprimir_tabuleiro(&matriz);
 
-    mov_torre(5, &matriz, &peca); // Chama a função recursiva para mover a torre 5 vezes para a direita.
+    mov_torre(5, &matriz, &peca); 
 
 
     // Bispo
@@ -193,7 +193,7 @@ int main() {
 
     int i = 0;
     
-    mov_bispo(5, &matriz, &peca); // Chama a função recursiva para mover o bispo 5 vezes para cima-direita.
+    mov_bispo(5, &matriz, &peca); 
 
 
     // Rainha
@@ -205,7 +205,7 @@ int main() {
 
     imprimir_tabuleiro(&matriz);
 
-    mov_rainha(7, &matriz, &peca); // Chama a função recursiva para mover a rainha 7 vezes para a esquerda.
+    mov_rainha(7, &matriz, &peca); 
 
 
     // Cavalo
@@ -216,6 +216,7 @@ int main() {
     *peca = (Casa) { PECA_CAVALO, COR_PRETO };
 
     imprimir_tabuleiro(&matriz);
+
     for (int i = 0, j = 0; i < 3; i++) {
         if (j < 2) {
             mover_peca(&matriz, &peca, MOV_CIMA);
